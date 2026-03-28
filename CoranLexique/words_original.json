@@ -1,0 +1,262 @@
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000001",
+    "arabic": "الله",
+    "transliteration": "Allāh",
+    "meaning": "Dieu (Allah)",
+    "root": "أله",
+    "category": "Nom",
+    "frequency": 2699,
+    "masteryLevel": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000002",
+    "arabic": "مِن",
+    "transliteration": "min",
+    "meaning": "De / Parmi / Depuis",
+    "root": "",
+    "category": "Particule",
+    "frequency": 3226,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000003",
+    "arabic": "قَالَ",
+    "transliteration": "qāla",
+    "meaning": "Il a dit",
+    "root": "قول",
+    "category": "Verbe",
+    "frequency": 1722,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000004",
+    "arabic": "رَبّ",
+    "transliteration": "rabb",
+    "meaning": "Seigneur / Maître",
+    "root": "ربب",
+    "category": "Nom",
+    "frequency": 970,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000005",
+    "arabic": "لَا",
+    "transliteration": "lā",
+    "meaning": "Non / Pas",
+    "root": "",
+    "category": "Particule",
+    "frequency": 1710,
+    "masteryLevel": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000006",
+    "arabic": "فِي",
+    "transliteration": "fī",
+    "meaning": "Dans / En",
+    "root": "",
+    "category": "Particule",
+    "frequency": 1706,
+    "masteryLevel": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000007",
+    "arabic": "كَانَ",
+    "transliteration": "kāna",
+    "meaning": "Il était / Il fut",
+    "root": "كون",
+    "category": "Verbe",
+    "frequency": 1360,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000008",
+    "arabic": "إِنَّ",
+    "transliteration": "inna",
+    "meaning": "Certes / Vraiment",
+    "root": "",
+    "category": "Particule",
+    "frequency": 1448,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000009",
+    "arabic": "إِلَى",
+    "transliteration": "ilā",
+    "meaning": "Vers / À",
+    "root": "",
+    "category": "Particule",
+    "frequency": 1488,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000010",
+    "arabic": "عَلَى",
+    "transliteration": "ʿalā",
+    "meaning": "Sur / Contre",
+    "root": "",
+    "category": "Particule",
+    "frequency": 1461,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000011",
+    "arabic": "هُوَ",
+    "transliteration": "huwa",
+    "meaning": "Lui / Il",
+    "root": "",
+    "category": "Pronom",
+    "frequency": 714,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000012",
+    "arabic": "آمَنَ",
+    "transliteration": "āmana",
+    "meaning": "Il a cru / Il a eu foi",
+    "root": "أمن",
+    "category": "Verbe",
+    "frequency": 537,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000013",
+    "arabic": "أَرض",
+    "transliteration": "arḍ",
+    "meaning": "Terre / Sol",
+    "root": "أرض",
+    "category": "Nom",
+    "frequency": 461,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000014",
+    "arabic": "يَوم",
+    "transliteration": "yawm",
+    "meaning": "Jour",
+    "root": "يوم",
+    "category": "Nom",
+    "frequency": 405,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000015",
+    "arabic": "عَمِلَ",
+    "transliteration": "ʿamila",
+    "meaning": "Il a œuvré / Agi",
+    "root": "عمل",
+    "category": "Verbe",
+    "frequency": 360,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000016",
+    "arabic": "جَعَلَ",
+    "transliteration": "jaʿala",
+    "meaning": "Il a fait / créé / établi",
+    "root": "جعل",
+    "category": "Verbe",
+    "frequency": 346,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000017",
+    "arabic": "هُم",
+    "transliteration": "hum",
+    "meaning": "Eux / Ils",
+    "root": "",
+    "category": "Pronom",
+    "frequency": 354,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000018",
+    "arabic": "نَاس",
+    "transliteration": "nās",
+    "meaning": "Les gens / L'humanité",
+    "root": "نوس",
+    "category": "Nom",
+    "frequency": 241,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000019",
+    "arabic": "أَنتَ",
+    "transliteration": "anta",
+    "meaning": "Toi / Tu",
+    "root": "",
+    "category": "Pronom",
+    "frequency": 195,
+    "masteryLevel": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000020",
+    "arabic": "كِتَاب",
+    "transliteration": "kitāb",
+    "meaning": "Livre / Écriture",
+    "root": "كتب",
+    "category": "Nom",
+    "frequency": 255,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000021",
+    "arabic": "عَظِيم",
+    "transliteration": "ʿaẓīm",
+    "meaning": "Grand / Immense / Sublime",
+    "root": "عظم",
+    "category": "Adjectif",
+    "frequency": 159,
+    "masteryLevel": 0
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000022",
+    "arabic": "رَحِيم",
+    "transliteration": "raḥīm",
+    "meaning": "Très Miséricordieux",
+    "root": "رحم",
+    "category": "Adjectif",
+    "frequency": 95,
+    "masteryLevel": 2
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000023",
+    "arabic": "كَبِير",
+    "transliteration": "kabīr",
+    "meaning": "Grand / Important / Considérable",
+    "root": "كبر",
+    "category": "Adjectif",
+    "frequency": 97,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000024",
+    "arabic": "نَبِيّ",
+    "transliteration": "nabī",
+    "meaning": "Prophète",
+    "root": "نبأ",
+    "category": "Nom",
+    "frequency": 75,
+    "masteryLevel": 3
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000025",
+    "arabic": "نَحنُ",
+    "transliteration": "naḥnu",
+    "meaning": "Nous",
+    "root": "",
+    "category": "Pronom",
+    "frequency": 110,
+    "masteryLevel": 1
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000026",
+    "arabic": "كَرِيم",
+    "transliteration": "karīm",
+    "meaning": "Noble / Généreux",
+    "root": "كرم",
+    "category": "Adjectif",
+    "frequency": 27,
+    "masteryLevel": 0
+  }
+]
