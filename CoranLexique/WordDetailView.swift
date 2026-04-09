@@ -6,6 +6,7 @@
 
 import SwiftUI
 import SwiftData
+import AVFoundation
 
 // MARK: - Niveau de maîtrise (pour l'affichage)
 
@@ -41,6 +42,60 @@ private extension Int {
         case 3:  return .yellow
         default: return .green
         }
+    }
+}
+
+// MARK: - WordReader
+
+/// Lecture vocale one-shot d'un mot arabe.
+@Observable
+@MainActor
+final class WordReader: NSObject, AVSpeechSynthesizerDelegate {
+    private(set) var isSpeaking = false
+    private let synthesizer = AVSpeechSynthesizer()
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func speak(_ arabic: String) {
+        synthesizer.stopSpeaking(at: .immediate)
+        let utterance = AVSpeechUtterance(string: arabic)
+        utterance.voice = preferredArabicVoice()
+        utterance.rate  = 0.38
+        utterance.pitchMultiplier = 0.95
+        utterance.volume = 1.0
+        isSpeaking = true
+        synthesizer.speak(utterance)
+    }
+
+    private func preferredArabicVoice() -> AVSpeechSynthesisVoice? {
+        let voices = AVSpeechSynthesisVoice.speechVoices().filter {
+            $0.language.hasPrefix("ar") && $0.gender == .male
+        }
+        let best = voices.max { lhs, rhs in
+            qualityRank(lhs.quality) < qualityRank(rhs.quality)
+        }
+        return best ?? AVSpeechSynthesisVoice(language: "ar-SA")
+    }
+
+    private func qualityRank(_ q: AVSpeechSynthesisVoiceQuality) -> Int {
+        switch q {
+        case .enhanced: return 2
+        case .default:  return 1
+        default:        return 0
+        }
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
+                                       didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor in self.isSpeaking = false }
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
+                                       didCancel utterance: AVSpeechUtterance) {
+        Task { @MainActor in self.isSpeaking = false }
     }
 }
 
@@ -131,24 +186,42 @@ struct WordDetailView: View {
 
 private struct ArabicHeaderCard: View {
     let word: WordModel
+    @State private var reader = WordReader()
 
     var body: some View {
-        VStack(spacing: 10) {
-            CategoryBadgeView(category: word.category)
+        ZStack(alignment: .topTrailing) {
+            // Contenu centré
+            VStack(spacing: 10) {
+                CategoryBadgeView(category: word.category)
 
-            Text(word.arabic)
-                .font(.system(size: 72, weight: .bold))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .environment(\.layoutDirection, .rightToLeft)
+                Text(word.arabic)
+                    .font(.system(size: 72, weight: .bold))
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .environment(\.layoutDirection, .rightToLeft)
 
-            Text(word.transliteration)
-                .font(.title2)
-                .italic()
-                .foregroundStyle(.secondary)
+                Text(word.transliteration)
+                    .font(.title2)
+                    .italic()
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 32)
+
+            // Bouton lecture — coin supérieur droit
+            Button {
+                reader.speak(word.arabic)
+            } label: {
+                Image(systemName: reader.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2")
+                    .font(.body.weight(.medium))
+                    .symbolEffect(.variableColor.iterative, isActive: reader.isSpeaking)
+                    .foregroundStyle(reader.isSpeaking ? Color.accentColor : .secondary)
+                    .frame(width: 36, height: 36)
+                    .background(.quaternary, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(14)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }

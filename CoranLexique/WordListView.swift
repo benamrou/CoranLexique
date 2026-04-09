@@ -29,12 +29,14 @@ private struct SearchItem: Sendable {
     let meaning:         String
     let root:            String
     let category:        WordCategory
+    let surahNumbers:    [Int]
 }
 
-/// Clé composite pour .task(id:) — déclenche le filtre sur texte OU catégorie.
+/// Clé composite pour .task(id:) — déclenche le filtre sur texte, catégorie OU sourate.
 private struct FilterKey: Equatable {
     let text:     String
     let category: String  // rawValue ou "" si nil
+    let surah:    Int     // 0 = toutes
 }
 
 // MARK: - WordListView
@@ -48,16 +50,18 @@ struct WordListView: View {
     private var allWords: [WordModel]
 
     @State private var selectedCategory:   WordCategory? = nil
-    @State private var searchText:         String        = ""
-    @State private var filteredWords:      [WordModel]   = []   // résultat async du filtre
-    @State private var searchItems:        [SearchItem]  = []   // index léger pour thread secondaire
-    @State private var isDashboardVisible: Bool          = true
-    @State private var isQuizPresented:    Bool          = false
-    @State private var isAboutPresented:   Bool          = false
+    @State private var selectedSurah:     Int           = 0    // 0 = toutes
+    @State private var searchText:        String        = ""
+    @State private var filteredWords:     [WordModel]   = []   // résultat async du filtre
+    @State private var searchItems:       [SearchItem]  = []   // index léger pour thread secondaire
+    @State private var isDashboardVisible: Bool         = true
+    @State private var isQuizPresented:         Bool          = false
+    @State private var isAboutPresented:        Bool          = false
+    @State private var isMemorizationPresented: Bool          = false
 
     /// Affichage immédiat : allWords quand aucun filtre actif, sinon résultat async.
     private var displayedWords: [WordModel] {
-        searchText.isEmpty && selectedCategory == nil ? allWords : filteredWords
+        searchText.isEmpty && selectedCategory == nil && selectedSurah == 0 ? allWords : filteredWords
     }
 
     var body: some View {
@@ -65,7 +69,7 @@ struct WordListView: View {
             VStack(spacing: 0) {
 
                 // ── Chips de filtrage ──────────────────────────────────────
-                CategoryFilterBar(selectedCategory: $selectedCategory)
+                FilterBar(selectedCategory: $selectedCategory, selectedSurah: $selectedSurah)
 
                 // ── Tableau de bord (rétractable) ─────────────────────────
                 if isDashboardVisible {
@@ -96,13 +100,17 @@ struct WordListView: View {
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Arabe, translittération, signification…"
             )
-            .task(id: FilterKey(text: searchText, category: selectedCategory?.rawValue ?? "")) {
+            .task(id: FilterKey(text: searchText, category: selectedCategory?.rawValue ?? "", surah: selectedSurah)) {
                 let query = searchText
                 let cat   = selectedCategory
+                let surah = selectedSurah
 
-                // Sans texte : filtre catégorie uniquement, pas de debounce nécessaire
+                // Sans texte : filtre catégorie + sourate uniquement, pas de debounce nécessaire
                 guard !query.isEmpty else {
-                    filteredWords = cat == nil ? allWords : allWords.filter { $0.category == cat }
+                    var result = allWords
+                    if let cat { result = result.filter { $0.category == cat } }
+                    if surah != 0 { result = result.filter { $0.surahNumbers.contains(surah) } }
+                    filteredWords = result
                     return
                 }
 
@@ -119,6 +127,7 @@ struct WordListView: View {
                     var ids = Set<UUID>()
                     for item in items {
                         guard cat == nil || item.category == cat else { continue }
+                        if surah != 0 && !item.surahNumbers.contains(surah) { continue }
                         if item.arabic.contains(query)
                             || item.transliteration.range(of: query, options: .caseInsensitive) != nil
                             || item.meaning.range(of: query, options: .caseInsensitive) != nil
@@ -137,7 +146,8 @@ struct WordListView: View {
                 Task {
                     searchItems = words.map {
                         SearchItem(id: $0.id, arabic: $0.arabic, transliteration: $0.transliteration,
-                                   meaning: $0.meaning, root: $0.root, category: $0.category)
+                                   meaning: $0.meaning, root: $0.root, category: $0.category,
+                                   surahNumbers: $0.surahNumbers)
                     }
                 }
             }
@@ -161,6 +171,17 @@ struct WordListView: View {
                             .clipShape(Capsule())
                     }
                     .accessibilityLabel("Lancer un quiz")
+                }
+
+                // Bouton Mémorisation (barre gauche)
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isMemorizationPresented = true
+                    } label: {
+                        Image(systemName: "headphones")
+                            .font(.body.weight(.semibold))
+                    }
+                    .accessibilityLabel("Mémorisation auditive")
                 }
 
                 // Bascule Tableau de bord (barre droite)
@@ -195,6 +216,10 @@ struct WordListView: View {
             .sheet(isPresented: $isAboutPresented) {
                 AboutView()
             }
+            // ── Présentation de la Mémorisation ───────────────────────────
+            .sheet(isPresented: $isMemorizationPresented) {
+                MemorizationView(allWords: allWords)
+            }
         }
         .onAppear {
             DataImporter.importIfNeeded(context: modelContext)
@@ -204,30 +229,47 @@ struct WordListView: View {
             // Construction de l'index après le premier rendu — ne bloque pas l'UI
             searchItems = allWords.map {
                 SearchItem(id: $0.id, arabic: $0.arabic, transliteration: $0.transliteration,
-                           meaning: $0.meaning, root: $0.root, category: $0.category)
+                           meaning: $0.meaning, root: $0.root, category: $0.category,
+                           surahNumbers: $0.surahNumbers)
             }
         }
     }
 }
 
-// MARK: - CategoryFilterBar
+// MARK: - FilterBar
 
-struct CategoryFilterBar: View {
+struct FilterBar: View {
     @Binding var selectedCategory: WordCategory?
+    @Binding var selectedSurah:    Int            // 0 = toutes
+
+    @State private var isSurahPickerPresented = false
+
+    private var isSurahActive: Bool { selectedSurah != 0 }
+    private var isAnyFilterActive: Bool { selectedCategory != nil || isSurahActive }
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
 
+                // ── Tous ──────────────────────────────────────────────────
                 CategoryChip(
                     label:      "Tous",
                     systemIcon: "square.grid.2x2.fill",
-                    isSelected: selectedCategory == nil,
+                    isSelected: !isAnyFilterActive,
                     color:      .accentColor
                 ) {
-                    withAnimation(.snappy(duration: 0.25)) { selectedCategory = nil }
+                    withAnimation(.snappy(duration: 0.25)) {
+                        selectedCategory = nil
+                        selectedSurah    = 0
+                    }
                 }
 
+                // ── Séparateur visuel ─────────────────────────────────────
+                Divider()
+                    .frame(height: 20)
+                    .padding(.horizontal, 2)
+
+                // ── Catégories ────────────────────────────────────────────
                 ForEach(WordCategory.allCases) { category in
                     CategoryChip(
                         label:      category.rawValue,
@@ -240,11 +282,50 @@ struct CategoryFilterBar: View {
                         }
                     }
                 }
+
+                // ── Séparateur visuel ─────────────────────────────────────
+                Divider()
+                    .frame(height: 20)
+                    .padding(.horizontal, 2)
+
+                // ── Sourate ───────────────────────────────────────────────
+                CategoryChip(
+                    label:      isSurahActive
+                                    ? "S.\(selectedSurah) · \(SurahInfo.name(for: selectedSurah))"
+                                    : "Sourate",
+                    systemIcon: "book.closed",
+                    isSelected: isSurahActive,
+                    color:      .teal
+                ) {
+                    isSurahPickerPresented = true
+                }
+
+                // Croix pour effacer le filtre sourate actif
+                if isSurahActive {
+                    Button {
+                        withAnimation(.snappy(duration: 0.25)) { selectedSurah = 0 }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.teal)
+                            .font(.body)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
         }
         .background(.ultraThinMaterial)
+        .sheet(isPresented: $isSurahPickerPresented) {
+            NavigationStack {
+                SurahPickerView(selectedSurah: $selectedSurah)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Fermer") { isSurahPickerPresented = false }
+                        }
+                    }
+            }
+        }
     }
 }
 
